@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CloudTest.CollectionPage"
+             xmlns:local="clr-namespace:CloudTest"
+             Title="cloudtest collection">
+
+  <ContentPage.ToolbarItems>
+    <ToolbarItem 
+      x:Name="back"
+      Text="Back"
+      IconImageSource="cloudtest.Assets.icons.arrow_back-24px.png"
+      Order="Primary"
+      Clicked="OnBackClicked"
+      Priority="0" />
+
+    <ToolbarItem 
+      x:Name="page"
+      Text="Page"
+      IconImageSource="cloudtest.Assets.icons.crop-din-24px.png"
+      Order="Primary"
+      Clicked="OnPageClicked"
+      Priority="0" />
+  </ContentPage.ToolbarItems>
+
+  <StackLayout>
+    <CollectionView
+      x:Name="DetailGrid"
+      ItemsLayout="VerticalGrid, 2"
+      >
+<!--
+      <CollectionView.ItemsLayout>
+        <GridItemsLayout Orientation="Vertical" Span="2" />
+      </CollectionView.ItemsLayout> -->
+      <!-- DO NOT USE, FAILS ON ANDROID: ItemsLayout="VerticalGrid, 2" -->
+
+      <CollectionView.ItemTemplate>
+        <DataTemplate>
+          <StackLayout Padding="20" BackgroundColor="Crimson">
+            <Image Source= "{Binding Path}" WidthRequest="300"/>
+            <Label Text="{Binding FileName}" TextColor ="Bisque" LineBreakMode="WordWrap" />
+          </StackLayout>
+        </DataTemplate>
+      </CollectionView.ItemTemplate>
+    </CollectionView>
+
+    <Button Text="Add" Clicked="OnAddClicked" />
+  </StackLayout>
+</ContentPage>
