@@ -1,28 +1,40 @@
-﻿using System;
+﻿using CloudTest.DbAccess;
+using System;
+using System.Net.Http;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace CloudTest
 {
-    public partial class App : Application
+  public partial class App : Application
+  {
+    //-----------------------------------------------------------------------------
+    public HttpClient httpClient = null;
+
+    //-----------------------------------------------------------------------------
+    public App ()
     {
-        public App()
-        {
-            InitializeComponent();
+      httpClient = new HttpClient();
+      Console.WriteLine("OnStart.begin");
 
-            MainPage = new NavigationPage (new ListPage());
-        }
+      InitializeComponent();
 
-        protected override void OnStart()
-        {
-        }
-
-        protected override void OnSleep()
-        {
-        }
-
-        protected override void OnResume()
-        {
-        }
+      MainPage = new NavigationPage (new ListPage ());
     }
+
+    //-----------------------------------------------------------------------------
+    protected override void OnStart()
+    {
+    }
+
+    //-----------------------------------------------------------------------------
+    protected override void OnSleep ()
+    {
+    }
+
+    //-----------------------------------------------------------------------------
+    protected override void OnResume ()
+    {
+    }
+  }
 }

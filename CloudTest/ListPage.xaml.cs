@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CloudTest.Nodes;
+using Newtonsoft.Json;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
@@ -18,6 +21,13 @@ namespace CloudTest
     public ObservableCollection<NodeData> nodes = new ObservableCollection<NodeData>();
 
     //-----------------------------------------------------------------------------
+    private class Item // members must be public for DeserializeObject.
+    {
+      public int id { get; set; }
+      public String description { get; set; }
+    }
+
+    //-----------------------------------------------------------------------------
     public ListPage ()
     {
       InitializeComponent ();
@@ -28,19 +38,56 @@ namespace CloudTest
       item = (ToolbarItem)FindByName ("page");
       item.IconImageSource = ImageSource.FromResource ("CloudTest.Assets.icons.crop_din-24px.png");
 
-      nodes.Add (new NoteData { Note = "As Donald Trump tried to claim victory before votes were tallied in critical battleground states, the Biden campaign was privately telling supporters not to panic, even as it prepared for pitched legal battles with the president." });
-      nodes.Add (new NoteData { Note = "In a Zoom call with donors Wednesday, the aides told the group that Joe Biden was on pace to reach 270 electoral votes in short order, beaming over victories in the Midwestern states that Donald Trump flipped four years ago." });
-      nodes.Add (new ImageData { FileName = "image_chair_pk.jpg" });
-      nodes.Add (new ImageData { FileName = "image_chanty.jpg" });
-      nodes.Add (new NoteData { Note = "Item 3" });
-      nodes.Add (new NoteData { Note = "Item 4" });
-      nodes.Add (new NoteData { Note = "Item 5" });
-      nodes.Add (new NoteData { Note = "Item 6" });
-      nodes.Add (new NoteData { Note = "Item 7" });
-      nodes.Add (new NoteData { Note = "Item 8" });
-      nodes.Add (new NoteData { Note = "Item 9" });
+      LoadList();
 
       DetailList.ItemsSource = nodes;
+    }
+
+    //-----------------------------------------------------------------------------
+    public async Task LoadList ()
+    {
+      try
+      {
+        HttpClient httpClient = ((App)App.Current).httpClient;
+        HttpResponseMessage response = null;
+
+        // get folder
+        Uri uri = new Uri("https://xamarin.perinote.com/root");
+        response = await httpClient.GetAsync(uri);
+        if (!response.IsSuccessStatusCode)
+        {
+          // exit and send notification to UI thread
+          return;
+        }
+        string results = await response.Content.ReadAsStringAsync();
+        var folder = JsonConvert.DeserializeObject<Item[]> (results);
+        if (folder.Length != 1)
+        {
+          // exit and send notification to UI thread
+          return;
+        }
+
+        // get items
+        uri = new Uri("https://xamarin.perinote.com/children?parent=" + folder[0].id);
+        response = await httpClient.GetAsync(uri);
+        if (!response.IsSuccessStatusCode)
+        {
+          // exit and send notification to UI thread
+          return;
+        }
+        results = await response.Content.ReadAsStringAsync();
+        var children = JsonConvert.DeserializeObject<Item[]>(results);
+
+        Device.BeginInvokeOnMainThread (() => 
+        {
+          foreach (var child in children)
+            nodes.Add (new NoteData { Note = child.description });
+        });
+      }
+      catch (Exception e)
+      {
+        Debug.WriteLine("http exception: ", e.ToString());
+      }
     }
 
     //-----------------------------------------------------------------------------
@@ -78,6 +125,12 @@ namespace CloudTest
     async void OnMenuClicked (object sender, EventArgs args)
     {
       await DisplayAlert("Menu", "Menu", "OK");
+    }
+
+    //-----------------------------------------------------------------------------
+    async void OnLoadError (object sender, EventArgs args)
+    {
+      
     }
   }
 }

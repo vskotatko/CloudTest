@@ -10,5 +10,23 @@ namespace CloudTest.DbAccess
     //   parentId long
     //   childId long
     //   sequenceId float ??? or consider linked list approach
+
+    static DbModel currentConnection = null;
+
+    static public void OpenConnection ()
+    {
+      if (currentConnection != null)
+        throw new Exception ("DbModel: connection already open");
+      currentConnection = new DbModel();
+
+    }
+
+    static public void CloseConnection ()
+    {
+      if (currentConnection != null)
+      {
+        currentConnection = null;
+      }
+    }
   }
 }
