@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CloudTest.Nodes;
@@ -17,6 +19,8 @@ namespace CloudTest
   [XamlCompilation(XamlCompilationOptions.Compile)]
   public partial class ListPage : ContentPage
   {
+    int parentId = -1; // -1 == undefined
+
     //-----------------------------------------------------------------------------
     public ObservableCollection<NodeData> nodes = new ObservableCollection<NodeData>();
 
@@ -66,9 +70,10 @@ namespace CloudTest
           // exit and send notification to UI thread
           return;
         }
+        parentId = folder[0].id;
 
         // get items
-        uri = new Uri("https://xamarin.perinote.com/children?parent=" + folder[0].id);
+        uri = new Uri("https://xamarin.perinote.com/children?parent=" + parentId);
         response = await httpClient.GetAsync(uri);
         if (!response.IsSuccessStatusCode)
         {
@@ -103,10 +108,36 @@ namespace CloudTest
     }
 
     //-----------------------------------------------------------------------------
-    void OnAddClicked (object sender, EventArgs args)
+    async void OnAddClicked (object sender, EventArgs args)
     {
-//      await DisplayAlert("Add Tapped", "An button was tapped.", "OK");
-      nodes.Add (new NoteData { Note = DateTime.Now.ToString() });
+      if (parentId == -1)
+      {
+        DisplayAlert("Error", "Can't add, parentId is -1.", "OK");
+        return;
+      }
+
+      // create some text for the new note
+      string description = DateTime.Now.ToString();
+
+      // prepare data for the addnote endpoint
+      Uri uri = new Uri("https://xamarin.perinote.com/addnote");
+      MultipartFormDataContent content = new MultipartFormDataContent();
+      content.Headers.ContentType.MediaType = "multipart/form-data";
+      content.Add(new StringContent(parentId.ToString()), "parent");
+      content.Add(new StringContent(description), "description");
+
+      // post
+      HttpClient httpClient = ((App)App.Current).httpClient;
+      HttpResponseMessage response = null;
+      response = await httpClient.PostAsync(uri, content);
+      if (!response.IsSuccessStatusCode)
+      {
+        DisplayAlert("Error", response.StatusCode.ToString(), "OK");
+        return;
+      }
+
+      // display
+      nodes.Add(new NoteData { Note = description });
     }
 
     //-----------------------------------------------------------------------------
