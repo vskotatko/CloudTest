@@ -1,29 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CloudTest.CollectionPage"
-             xmlns:local="clr-namespace:CloudTest"
-             Title="cloudtest collection">
-
-  <ContentPage.ToolbarItems>
-    <ToolbarItem 
-      x:Name="back"
-      Text="Back"
-      IconImageSource="cloudtest.Assets.icons.arrow_back-24px.png"
-      Order="Primary"
-      Clicked="OnBackClicked"
-      Priority="0" />
-
-    <ToolbarItem 
-      x:Name="page"
-      Text="Page"
-      IconImageSource="cloudtest.Assets.icons.crop-din-24px.png"
-      Order="Primary"
-      Clicked="OnPageClicked"
-      Priority="0" />
-  </ContentPage.ToolbarItems>
+<ContentPage 
+  xmlns="http://xamarin.com/schemas/2014/forms"
+  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+  x:Class="CloudTest.CollectionPage"
+  NavigationPage.HasNavigationBar="False"
+  xmlns:local="clr-namespace:CloudTest">
 
   <StackLayout>
+    <StackLayout 
+      Orientation="Horizontal"
+      BackgroundColor="AliceBlue" >
+
+      <Label 
+        HorizontalOptions="StartAndExpand"
+        x:Name="folder"
+        Text="My Folder" />
+
+      <ImageButton
+        x:Name="back"
+        HorizontalOptions="End"
+        Source="{local:ImageResource CloudTest.Assets.icons.arrow_back.png}"
+        Clicked="OnBackClicked" />
+
+      <ImageButton
+        x:Name="page"
+        HorizontalOptions="End"
+        Source="{local:ImageResource CloudTest.Assets.icons.crop_din.png}"
+        Clicked="OnPageClicked" />
+
+      <ImageButton
+        x:Name="reset"
+        HorizontalOptions="End"
+        Source="{local:ImageResource CloudTest.Assets.icons.more_vert.png}"
+        Clicked="OnResetClicked" />
+    </StackLayout>
+
     <CollectionView
       x:Name="DetailGrid"
       ItemsLayout="VerticalGrid, 2"

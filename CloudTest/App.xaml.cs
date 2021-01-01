@@ -1,6 +1,8 @@
 ﻿using CloudTest.DbAccess;
 using System;
+using System.Diagnostics;
 using System.Net.Http;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -19,7 +21,7 @@ namespace CloudTest
 
       InitializeComponent();
 
-      MainPage = new NavigationPage (new ListPage ());
+      MainPage = new NavigationPage(new ListPage());
     }
 
     //-----------------------------------------------------------------------------

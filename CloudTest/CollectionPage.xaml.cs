@@ -22,12 +22,6 @@ namespace CloudTest
     {
       InitializeComponent ();
 
-      // toolbar
-      ToolbarItem item = (ToolbarItem)FindByName ("back");
-      item.IconImageSource = ImageSource.FromResource("CloudTest.Assets.icons.arrow_back-24px.png"); 
-      item = (ToolbarItem)FindByName("page");
-      item.IconImageSource = ImageSource.FromResource ("CloudTest.Assets.icons.crop_din-24px.png");
-
       nodes.Add (new ImageData { FileName = "image_chair_pk.jpg" });
       nodes.Add (new ImageData { FileName = "image_chanty.jpg" });
       nodes.Add (new ImageData { FileName = "beach.jpg" });
@@ -67,6 +61,12 @@ namespace CloudTest
     async void OnPageClicked (object sender, EventArgs args)
     {
       await Navigation.PushAsync(new ListPage());
+    }
+
+    //-----------------------------------------------------------------------------
+    async void OnResetClicked(object sender, EventArgs args)
+    {
+      await DisplayAlert("Menu", "Reset clicked", "OK");
     }
 
     //-----------------------------------------------------------------------------

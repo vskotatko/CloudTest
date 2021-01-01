@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CloudTest.Nodes;
 using Newtonsoft.Json;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
@@ -36,14 +37,24 @@ namespace CloudTest
     {
       InitializeComponent ();
 
-      // toolbar
-      ToolbarItem item = (ToolbarItem)FindByName ("back");
-      item.IconImageSource = ImageSource.FromResource ("CloudTest.Assets.icons.arrow_back-24px.png"); 
-      item = (ToolbarItem)FindByName ("page");
-      item.IconImageSource = ImageSource.FromResource ("CloudTest.Assets.icons.crop_din-24px.png");
+      // adjust size of icons in menu bar
+      IScreenMetrics metrics = DependencyService.Get<IScreenMetrics>();
+      double adjustedDensity = metrics.AdjustedDensity();
+
+      StackLayout titlebar = (StackLayout)FindByName("titlebar");
+      foreach (VisualElement child in titlebar.Children)
+      {
+//        if (child.GetType().Equals (typeof(ImageButton)))
+        {
+          if (child.HeightRequest != -1)
+            child.HeightRequest = child.HeightRequest * adjustedDensity;
+          if (child.WidthRequest != -1)
+            child.WidthRequest = child.WidthRequest * adjustedDensity;
+        }
+      }
+      titlebar.ForceLayout();
 
       LoadList();
-
       DetailList.ItemsSource = nodes;
     }
 
@@ -71,6 +82,9 @@ namespace CloudTest
           return;
         }
         parentId = folder[0].id;
+
+        // set folder description in title bar
+        Folder.Text = folder[0].description;
 
         // get items
         uri = new Uri("https://xamarin.perinote.com/children?parent=" + parentId);
@@ -143,7 +157,7 @@ namespace CloudTest
     //-----------------------------------------------------------------------------
     async void OnBackClicked (object sender, EventArgs args)
     {
-      await DisplayAlert ("Back", "Back", "OK");
+      await DisplayAlert ("Menu", "Back clicked", "OK");
     }
 
     //-----------------------------------------------------------------------------
@@ -153,15 +167,70 @@ namespace CloudTest
     }
 
     //-----------------------------------------------------------------------------
-    async void OnMenuClicked (object sender, EventArgs args)
+    async void OnMenuClicked(object sender, EventArgs args)
     {
-      await DisplayAlert("Menu", "Menu", "OK");
+      // get bottom position of sender, which is the clicked buttoin
+      View view = (View)sender;
+      var senderBottom = view.Bounds.Bottom;
+
+      // get popupMenu stacklayout
+      VisualElement popupMenu = (VisualElement)FindByName("PopupMenu");
+
+      // set popupLayout position; expecting X proportional, Y absolute, width proportional, height dynamic.
+      var height = popupMenu.Bounds.Height;
+      AbsoluteLayout.SetLayoutBounds(popupMenu, new Rectangle(0, senderBottom, 1, -1));
+
+      // make the popupLayout layout visible (which contains the popupMenu)
+      ShowPopupMenu(true);
+      VisualElement popupLayout = (VisualElement)FindByName("PopupLayout");
+      popupLayout.IsVisible = true;
     }
 
     //-----------------------------------------------------------------------------
-    async void OnLoadError (object sender, EventArgs args)
+    private void ShowPopupMenu (bool show)
     {
-      
+      VisualElement popupLayout = (VisualElement)FindByName("PopupLayout");
+      popupLayout.IsVisible = show;
+    }
+
+    //-----------------------------------------------------------------------------
+    async void OnOutsidePopupClicked(object sender, EventArgs args)
+    {
+      ShowPopupMenu(false);
+    }
+
+    //-----------------------------------------------------------------------------
+    async void OnMenu1Clicked(object sender, EventArgs args)
+    {
+      ShowPopupMenu(false);
+      await DisplayAlert("Menu", "Menu 1 clicked", "OK");
+    }
+
+    //-----------------------------------------------------------------------------
+    async void OnMenu2Clicked(object sender, EventArgs args)
+    {
+      ShowPopupMenu(false);
+      await DisplayAlert("Menu", "Menu 2 clicked", "OK");
+    }
+
+    //-----------------------------------------------------------------------------
+    async void OnMenu3Clicked(object sender, EventArgs args)
+    {
+      ShowPopupMenu(false);
+      await DisplayAlert("Menu", "Menu 3 clicked", "OK");
+    }
+
+    //-----------------------------------------------------------------------------
+    async void OnMenu4Clicked(object sender, EventArgs args)
+    {
+      ShowPopupMenu(false);
+
+      var mainDisplayInfo = DeviceDisplay.MainDisplayInfo;
+      var density = mainDisplayInfo.Density;
+      Debug.WriteLine("Screen Density: " + density);
+
+      string msg = "Screen density: " + density;
+      await DisplayAlert("Menu", msg, "OK");
     }
   }
 }
