@@ -35,27 +35,34 @@ namespace CloudTest
     //-----------------------------------------------------------------------------
     public ListPage ()
     {
-      InitializeComponent ();
-
-      // adjust size of icons in menu bar
-      IScreenMetrics metrics = DependencyService.Get<IScreenMetrics>();
-      double adjustedDensity = metrics.AdjustedDensity();
-
-      StackLayout titlebar = (StackLayout)FindByName("titlebar");
-      foreach (VisualElement child in titlebar.Children)
+      try
       {
-//        if (child.GetType().Equals (typeof(ImageButton)))
-        {
-          if (child.HeightRequest != -1)
-            child.HeightRequest = child.HeightRequest * adjustedDensity;
-          if (child.WidthRequest != -1)
-            child.WidthRequest = child.WidthRequest * adjustedDensity;
-        }
-      }
-      titlebar.ForceLayout();
+        InitializeComponent();
 
-      LoadList();
-      DetailList.ItemsSource = nodes;
+        // adjust size of icons in menu bar
+        IScreenMetrics metrics = DependencyService.Get<IScreenMetrics>();
+        double adjustedDensity = metrics.AdjustedDensity();
+
+        StackLayout titlebar = (StackLayout)FindByName("titlebar");
+        foreach (VisualElement child in titlebar.Children)
+        {
+          //        if (child.GetType().Equals (typeof(ImageButton)))
+          {
+            if (child.HeightRequest != -1)
+              child.HeightRequest = child.HeightRequest * adjustedDensity;
+            if (child.WidthRequest != -1)
+              child.WidthRequest = child.WidthRequest * adjustedDensity;
+          }
+        }
+        titlebar.ForceLayout();
+
+        LoadList();
+        DetailList.ItemsSource = nodes;
+      }
+      catch (Exception e)
+      {
+        Debug.WriteLine("ListPage(): ", e.ToString());
+      }
     }
 
     //-----------------------------------------------------------------------------
@@ -83,9 +90,6 @@ namespace CloudTest
         }
         parentId = folder[0].id;
 
-        // set folder description in title bar
-        Folder.Text = folder[0].description;
-
         // get items
         uri = new Uri("https://xamarin.perinote.com/children?parent=" + parentId);
         response = await httpClient.GetAsync(uri);
@@ -97,8 +101,13 @@ namespace CloudTest
         results = await response.Content.ReadAsStringAsync();
         var children = JsonConvert.DeserializeObject<Item[]>(results);
 
+        // display
         Device.BeginInvokeOnMainThread (() => 
         {
+//          Folder.Label = "something a bit longer";
+//          Folder.Label = "tiny";
+          Folder.Label = folder[0].description;
+
           foreach (var child in children)
             nodes.Add (new NoteData { Note = child.description });
         });

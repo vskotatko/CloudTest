@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkiaSharp.Views.Forms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,5 @@ namespace CloudTest.Controls
       get { return (string)GetValue(LabelProperty); }
       set { SetValue(LabelProperty, value); }
     }
-
   }
 }

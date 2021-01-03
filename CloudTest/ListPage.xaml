@@ -11,8 +11,8 @@
       
       <DataTemplate x:Key="NoteTemplate">
         <ViewCell>
-          <StackLayout Padding="20" Margin="0,0,0,1" BackgroundColor="Tan">
-            <Label Text="{Binding Note}" TextColor ="Blue" LineBreakMode="WordWrap" />
+          <StackLayout Padding="20" Margin="0,0,0,1" BackgroundColor="{x:DynamicResource FolderBackgroundColor}">
+            <Label Text="{Binding Note}" TextColor="{x:DynamicResource FolderTextColor}" LineBreakMode="WordWrap" />
           </StackLayout>
         </ViewCell>
       </DataTemplate>
@@ -48,14 +48,12 @@
         x:Name="titlebar"
         Orientation="Horizontal" >
 
-        <Label
+        <controls:StretchImage
           x:Name="Folder"
           HeightRequest="25"
           HorizontalOptions="StartAndExpand"
-          Padding="10,3,10,0"
-          VerticalOptions="Center"
-          BackgroundColor="Gold"
-          Text="undefined" />
+          Label="undefined"
+          Source="CloudTest.Assets.icons.folder_tab.png" />
 
         <ImageButton
           x:Name="back"
